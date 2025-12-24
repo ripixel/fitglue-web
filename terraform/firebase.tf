@@ -1,17 +1,7 @@
-# Note: Firebase Hosting site is managed via firebase.json and Firebase CLI
-# Terraform will not create the hosting site, but can manage other Firebase resources if needed
-
-# Enable required APIs
-resource "google_project_service" "firebase_hosting" {
-  project = var.project_id
-  service = "firebasehosting.googleapis.com"
-
-  disable_on_destroy = false
-}
-
-resource "google_project_service" "firebase" {
-  project = var.project_id
-  service = "firebase.googleapis.com"
-
-  disable_on_destroy = false
-}
+# NOTE: Firebase APIs are enabled by scripts/setup_web_deployer.sh
+# Terraform does not manage these to avoid permission issues.
+# The bootstrap script enables:
+# - firebasehosting.googleapis.com
+# - firebase.googleapis.com
+# - storage.googleapis.com
+# - iamcredentials.googleapis.com
