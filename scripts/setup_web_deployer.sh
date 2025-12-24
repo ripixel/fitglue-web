@@ -83,6 +83,14 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
 
 echo "Permissions granted"
 
+# Grant Service Account Token Creator (required for workload identity impersonation)
+echo "🔐 Granting Token Creator permission for workload identity..."
+gcloud iam service-accounts add-iam-policy-binding \
+  "$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
+  --project="$PROJECT_ID" \
+  --role="roles/iam.serviceAccountTokenCreator" \
+  --member="serviceAccount:$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"
+
 # Allow CircleCI to impersonate the Web Deployer Service Account
 # Note: Uses the same attribute filter as the server deployer (CircleCI org ID)
 # The separation between server and web deployments is handled by using different
