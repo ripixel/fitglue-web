@@ -32,7 +32,9 @@ jobs:
           paths:
             - .
 
-  deploy:
+  # Terraform is minimal - just documents what bootstrap script creates
+  # This job is optional and can be skipped if no Terraform changes
+  terraform-apply:
     parameters:
       target:
         type: string
@@ -45,16 +47,13 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Install dependencies
-          command: |
-            apk add --no-cache python3 py3-pip curl bash nodejs npm
-      - run:
           name: Authenticate with GCP via OIDC
           command: |
             PROJECT_ID="fitglue-server-<< parameters.target >>"
             PROJECT_NUMBER="<< parameters.project_number >>"
 
             # Download and install gcloud SDK
+            apk add --no-cache python3 py3-pip curl bash
             curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
             tar -xf google-cloud-cli-linux-x86_64.tar.gz
             ./google-cloud-sdk/install.sh --quiet
@@ -73,7 +72,7 @@ jobs:
             # Authenticate
             gcloud auth login --brief --cred-file=/tmp/gcp_cred_config.json
 
-            # Set credentials for terraform and firebase
+            # Set credentials for terraform
             echo "export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_cred_config.json" >> $BASH_ENV
             echo "export PATH=\$PATH:$(pwd)/google-cloud-sdk/bin" >> $BASH_ENV
       - run:
@@ -82,10 +81,49 @@ jobs:
              export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_cred_config.json
              terraform -chdir=terraform init -backend-config=envs/<< parameters.target >>.backend.tfvars
       - run:
-          name: Deploy Infrastructure
+          name: Terraform Apply
           command: |
             export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_cred_config.json
             terraform -chdir=terraform apply -auto-approve -lock-timeout=20m -var-file="envs/<< parameters.target >>.tfvars"
+
+  firebase-deploy:
+    parameters:
+      target:
+        type: string
+      project_number:
+        type: string
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install gcloud SDK
+          command: |
+            curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
+            tar -xf google-cloud-cli-linux-x86_64.tar.gz
+            ./google-cloud-sdk/install.sh --quiet
+            echo "export PATH=\$PATH:$(pwd)/google-cloud-sdk/bin" >> $BASH_ENV
+      - run:
+          name: Authenticate with GCP via OIDC
+          command: |
+            PROJECT_ID="fitglue-server-<< parameters.target >>"
+            PROJECT_NUMBER="<< parameters.project_number >>"
+
+            # Store OIDC token
+            echo $CIRCLE_OIDC_TOKEN > /tmp/oidc_token.txt
+
+            # Create credential config
+            gcloud iam workload-identity-pools create-cred-config \
+              "projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/circleci-pool/providers/circleci-provider" \
+              --service-account=circleci-web-deployer@${PROJECT_ID}.iam.gserviceaccount.com \
+              --output-file=/tmp/gcp_cred_config.json \
+              --credential-source-file=/tmp/oidc_token.txt
+
+            # Authenticate
+            gcloud auth login --brief --cred-file=/tmp/gcp_cred_config.json
+
+            # Set credentials for Firebase
+            echo "export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_cred_config.json" >> $BASH_ENV
       - run:
           name: Deploy to Firebase Hosting
           command: |
@@ -98,8 +136,8 @@ workflows:
   pipeline:
     jobs:
       - build-and-test
-      - deploy:
-          name: deploy-dev
+      - terraform-apply:
+          name: terraform-apply-dev
           target: dev
           project_number: "911679924866"
           requires:
@@ -107,19 +145,40 @@ workflows:
           filters:
             branches:
               only: main
-      - deploy:
-          name: deploy-test
+      - firebase-deploy:
+          name: firebase-deploy-dev
+          target: dev
+          project_number: "911679924866"
+          requires:
+            - terraform-apply-dev
+          filters:
+            branches:
+              only: main
+      - terraform-apply:
+          name: terraform-apply-test
           target: test
           project_number: "797085295878"
           requires:
-            - deploy-dev
+            - firebase-deploy-dev
+      - firebase-deploy:
+          name: firebase-deploy-test
+          target: test
+          project_number: "797085295878"
+          requires:
+            - terraform-apply-test
       - approve-prod:
           type: approval
           requires:
-            - deploy-test
-      - deploy:
-          name: deploy-prod
+            - firebase-deploy-test
+      - terraform-apply:
+          name: terraform-apply-prod
           target: prod
           project_number: "605889586984"
           requires:
             - approve-prod
+      - firebase-deploy:
+          name: firebase-deploy-prod
+          target: prod
+          project_number: "605889586984"
+          requires:
+            - terraform-apply-prod
