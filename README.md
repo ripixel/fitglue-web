@@ -32,6 +32,13 @@ Firebase Hosting rewrites route requests to the appropriate backend:
 - **Infrastructure**: Terraform
 - **CI/CD**: CircleCI with OIDC authentication
 
+## Documentation
+
+- **[Local Development](docs/LOCAL_DEVELOPMENT.md)** - Running the site locally, linting, and making changes
+- **[Bootstrap Guide](docs/BOOTSTRAP.md)** - Setting up IAM configuration for CircleCI deployments
+- **[Deployment](docs/DEPLOYMENT.md)** - Automated and manual deployment processes
+- **[Architecture Decisions](docs/DECISIONS.md)** - Key design choices and rationale
+
 ## Quick Start
 
 ### Prerequisites
