@@ -84,15 +84,13 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
 echo "Permissions granted"
 
 # Allow CircleCI to impersonate the Web Deployer Service Account
-# Note: Uses the same attribute filter as the server deployer (CircleCI org ID)
-# The separation between server and web deployments is handled by using different
-# service accounts with different permissions, not by OIDC token attributes.
+# Note: Uses wildcard to allow any principal from the pool (matches server pattern)
 echo "🎭 Configuring Workload Identity binding..."
 gcloud iam service-accounts add-iam-policy-binding \
   "$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
   --project="$PROJECT_ID" \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_NAME/attribute.project_id/$CIRCLECI_ORG_ID"
+  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_NAME/*"
 
 # Grant Token Creator permission to the workload identity pool
 # This allows the pool to generate access tokens for the service account
@@ -101,7 +99,7 @@ gcloud iam service-accounts add-iam-policy-binding \
   "$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
   --project="$PROJECT_ID" \
   --role="roles/iam.serviceAccountTokenCreator" \
-  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_NAME/attribute.project_id/$CIRCLECI_ORG_ID"
+  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_NAME/*"
 
 echo ""
 echo "✅ Web Deployer Setup Complete!"
