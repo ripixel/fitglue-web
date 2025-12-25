@@ -1,10 +1,33 @@
-# Firebase Hosting Site
-#
-# Note: Firebase Hosting sites are created automatically on first deployment via Firebase CLI.
-# There is no Terraform resource for google_firebase_hosting_site in the Google provider.
-#
-# The site will be created when CircleCI runs:
-#   firebase deploy --only hosting --project fitglue-server-{env}
-#
-# If you need to pre-create the site manually, use:
-#   firebase hosting:sites:create {site-id} --project {project-id}
+# Enable Firebase APIs
+resource "google_project_service" "firebase" {
+  project = var.project_id
+  service = "firebase.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "firebase_hosting" {
+  project = var.project_id
+  service = "firebasehosting.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+# Initialize Firebase for the project
+# Note: This uses the null_resource with local-exec as there's no native Terraform resource
+resource "null_resource" "firebase_init" {
+  # Only run if Firebase APIs are enabled
+  depends_on = [
+    google_project_service.firebase,
+    google_project_service.firebase_hosting
+  ]
+
+  provisioner "local-exec" {
+    command = "gcloud alpha firebase projects:addfirebase ${var.project_id} || true"
+  }
+
+  # Trigger re-run if project changes
+  triggers = {
+    project_id = var.project_id
+  }
+}
