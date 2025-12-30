@@ -24,6 +24,10 @@
         "function": "hevy-webhook-handler"
       },
       {
+        "source": "/hooks/fitbit",
+        "function": "fitbit-webhook-handler"
+      },
+      {
         "source": "/api/**",
         "function": "api-service"
       },
