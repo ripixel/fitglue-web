@@ -10,8 +10,8 @@
     "lint:html": "htmlhint public/**/*.html",
     "lint:css": "stylelint public/**/*.css",
     "lint:css:fix": "stylelint public/**/*.css --fix",
-    "build": "tsc",
-    "watch": "tsc -w"
+    "build": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020",
+    "watch": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 --watch"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   "author": "James King",
   "license": "MIT",
   "devDependencies": {
+    "esbuild": "^0.27.2",
     "firebase-tools": "^13.24.1",
     "htmlhint": "^1.1.4",
     "stylelint": "^16.12.0",
