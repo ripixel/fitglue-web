@@ -10,8 +10,8 @@
     "lint:html": "htmlhint public/**/*.html",
     "lint:css": "stylelint public/**/*.css",
     "lint:css:fix": "stylelint public/**/*.css --fix",
-    "build": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020",
-    "watch": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 --watch"
+    "build": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 && esbuild src/waitlist.ts --bundle --outfile=public/js/waitlist.js --format=esm --target=es2020",
+    "watch": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 --watch & esbuild src/waitlist.ts --bundle --outfile=public/js/waitlist.js --format=esm --target=es2020 --watch"
   },
   "repository": {
     "type": "git",

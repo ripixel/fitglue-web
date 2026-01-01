@@ -40,8 +40,16 @@
         "function": "fitbit-webhook-handler"
       },
       {
+        "source": "/api/waitlist",
+        "function": "waitlist-handler"
+      },
+      {
         "source": "/api/**",
         "function": "api-service"
+      },
+      {
+        "source": "/waitlist",
+        "destination": "/waitlist.html"
       },
       {
         "source": "/auth/strava/callback",
