@@ -25,6 +25,9 @@ jobs:
             - ~/.npm
             - node_modules
       - run:
+          name: Build TypeScript
+          command: npm run build
+      - run:
           name: Lint HTML and CSS
           command: npm run lint
       - persist_to_workspace:

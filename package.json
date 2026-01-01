@@ -8,7 +8,9 @@
     "deploy": "firebase deploy --only hosting",
     "lint": "npm run lint:html && npm run lint:css",
     "lint:html": "htmlhint public/**/*.html",
-    "lint:css": "stylelint public/**/*.css"
+    "lint:css": "stylelint public/**/*.css",
+    "build": "tsc",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
@@ -20,6 +22,10 @@
     "firebase-tools": "^13.24.1",
     "htmlhint": "^1.1.4",
     "stylelint": "^16.12.0",
-    "stylelint-config-standard": "^36.0.1"
+    "stylelint-config-standard": "^36.0.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "firebase": "^10.0.0"
   }
 }

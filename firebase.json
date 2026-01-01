@@ -20,6 +20,18 @@
     ],
     "rewrites": [
       {
+        "source": "/app",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/login",
+        "destination": "/login.html"
+      },
+      {
+        "source": "/register",
+        "destination": "/register.html"
+      },
+      {
         "source": "/hooks/hevy",
         "function": "hevy-webhook-handler"
       },
