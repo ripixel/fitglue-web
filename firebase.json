@@ -37,7 +37,7 @@
       },
       {
         "source": "/hooks/fitbit",
-        "function": "fitbit-webhook-handler"
+        "function": "fitbit-handler"
       },
       {
         "source": "/api/waitlist",
