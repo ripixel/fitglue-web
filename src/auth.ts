@@ -52,18 +52,33 @@ async function init() {
     const isAppPage = path.includes('app') || path.includes('dashboard');
 
     // Define clean redirects
-    const LOGIN_URL = '/login.html';
-    const APP_URL = '/app.html';
+    const LOGIN_URL = '/login';
+    const APP_URL = '/app';
 
     if (user) {
       console.log('User is logged in:', user.uid);
       if (isAuthPage) {
         window.location.href = APP_URL;
       }
+
+      // Update Homepage Nav
+      const landingNav = document.getElementById('landing-nav');
+      if (landingNav) {
+        landingNav.innerHTML = `<a href="${APP_URL}" class="btn primary small">Dashboard</a>`;
+      }
     } else {
       console.log('User is logged out');
       if (isAppPage) {
         window.location.href = LOGIN_URL;
+      }
+
+      // Update Homepage Nav (Restore)
+      const landingNav = document.getElementById('landing-nav');
+      if (landingNav) {
+        landingNav.innerHTML = `
+            <a href="/login" class="nav-link">Login</a>
+            <a href="/register" class="btn primary small">Sign Up</a>
+        `;
       }
     }
   });
@@ -122,7 +137,7 @@ async function init() {
   bindClick('btn-logout', async () => {
     try {
       await signOut(auth);
-      window.location.href = '/login.html';
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout Error', error);
     }

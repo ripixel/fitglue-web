@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - FitGlue</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="module" src="js/auth.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+    <script type="module" src="/js/auth.js"></script>
   </head>
 
   <body>
@@ -15,7 +15,10 @@
         <h1 class="title small">
           <span class="fit">Fit</span><span class="glue">Glue</span>
         </h1>
-        <button id="btn-logout" class="btn text">Logout</button>
+        <div class="nav-actions">
+          <a href="/app/inputs" class="btn text">Pending Inputs</a>
+          <button id="btn-logout" class="btn text">Logout</button>
+        </div>
       </header>
 
       <main class="dashboard">
