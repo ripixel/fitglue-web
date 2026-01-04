@@ -44,8 +44,8 @@
         "function": "waitlist-handler"
       },
       {
-        "source": "/api/**",
-        "function": "api-service"
+        "source": "/api/inputs",
+        "function": "inputs-handler"
       },
       {
         "source": "/waitlist",

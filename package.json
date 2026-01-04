@@ -10,8 +10,9 @@
     "lint:html": "htmlhint public/**/*.html",
     "lint:css": "stylelint public/**/*.css",
     "lint:css:fix": "stylelint public/**/*.css --fix",
-    "build": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 && esbuild src/waitlist.ts --bundle --outfile=public/js/waitlist.js --format=esm --target=es2020",
-    "watch": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 --watch & esbuild src/waitlist.ts --bundle --outfile=public/js/waitlist.js --format=esm --target=es2020 --watch"
+    "build": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 && esbuild src/waitlist.ts --bundle --outfile=public/js/waitlist.js --format=esm --target=es2020 && esbuild src/pending_inputs.ts --bundle --outfile=public/js/pending_inputs.js --format=esm --target=es2020",
+    "watch": "esbuild src/auth.ts --bundle --outfile=public/js/auth.js --format=esm --target=es2020 --watch & esbuild src/waitlist.ts --bundle --outfile=public/js/waitlist.js --format=esm --target=es2020 --watch & esbuild src/pending_inputs.ts --bundle --outfile=public/js/pending_inputs.js --format=esm --target=es2020 --watch",
+    "gen-api": "npx openapi-typescript src/openapi/swagger.json -o src/openapi/schema.ts"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,8 @@
     "esbuild": "^0.27.2",
     "firebase-tools": "^13.24.1",
     "htmlhint": "^1.1.4",
+    "openapi-fetch": "^0.15.0",
+    "openapi-typescript": "^7.10.1",
     "stylelint": "^16.12.0",
     "stylelint-config-standard": "^36.0.1",
     "typescript": "^5.3.3"

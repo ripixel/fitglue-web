@@ -1,0 +1,182 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "FitGlue Internal API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fitglue.app"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "PendingInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "activity_id": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "description": "1=WAITING, 2=COMPLETED"
+          },
+          "required_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "input_data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "activity_id",
+          "status"
+        ]
+      },
+      "InputResolutionRequest": {
+        "type": "object",
+        "properties": {
+          "activity_id": {
+            "type": "string"
+          },
+          "input_data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "activity_id",
+          "input_data"
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/inputs": {
+      "get": {
+        "summary": "List pending inputs",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of pending inputs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inputs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PendingInput"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Resolve a pending input",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InputResolutionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Input resolved and activity re-published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pending input not found"
+          }
+        }
+      }
+    },
+    "/waitlist": {
+      "post": {
+        "summary": "Join waitlist",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "website_url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully joined"
+          },
+          "409": {
+            "description": "Already on waitlist"
+          }
+        }
+      }
+    }
+  }
+}
